@@ -1,4 +1,6 @@
-# Java in Container
+# Deving Java Service in a Container
+
+![awesome](./docs/yes.png)
 
 Hello World Java service running in Docker for Desktop.
 
@@ -6,11 +8,24 @@ Using [jib](https://github.com/GoogleContainerTools/jib) and [skaffold](https://
 
 Jib will build a docker container that will be published to the local docker registry.
 
+Skaffold will listen for changes and redeploy the image automagically.
+
 ## Prereqs
 
 Assumes that the Java SDK is already installed.  
 Install [Maven](https://maven.apache.org/)  
 Install [Docker for Desktop](https://www.docker.com/products/docker-desktop)  
+Install [Skaffold](https://skaffold.dev/docs/install/)  
+
+Enable Kuberneties on Docker for Desktop by going to Preferences and checking "Enable Kubernetes"
+
+![Docker Preferences](./docs/dockerPrefs.png)
+
+## Quick Start
+
+Run `skaffold dev` to build, run the container and start the watcher. Navigate to `http://localhost:8080/` and the app should be running! 
+  
+Edit `IndexController.java` and change "Hello World" to "Sup World". Skaffold will rebuild and republish the image. Refresh the browser to see the change. 
 
 ## Step by Step
 
@@ -81,3 +96,63 @@ docker run --publish=8080:8080 javaincontainer
 With the app now running as a docker container, visit `http://localhost:8080/` to get greeted!
 
 Next up is using [skaffold](https://skaffold.dev/) to auto rebuild and republish the container.
+
+### Skaffold
+
+
+Create a `skaffold.yaml` file in the root of the project:
+
+```yaml
+apiVersion: skaffold/v2beta5
+kind: Config
+build:
+  local:
+    push: false
+  artifacts:
+  - image: javaincontainer
+    context: .
+    jib: {}
+```
+
+This will use the local registry for the image `javaincontainer` and use jib for image building. 
+
+Next define the k8s manifest for the service. Create a new dir `k8s` and create a new file `web.yaml` with a simple service definition:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: web
+spec:
+  ports:
+  - port: 8080
+    name: http
+  type: LoadBalancer
+  selector:
+    app: web
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+      - name: web
+        image: javaincontainer
+        ports:
+          - containerPort: 8080
+```
+
+Run `skaffold dev` to rebuild the image and automatically deploy to the local Docker for Desktop. visit `http://localhost:8080/` to get greeted once again!  
+Now is when the real magic happens. Edit `IndexController.java` and change "Hello World" to "Sup World". Skaffold will automatically kick off the build and update your docker container. Once the rebuild is done, refresh the browser to be greeted with "Sup World"!
+
+![Docker Preferences](./docs/awesome.jpeg)
+ 
