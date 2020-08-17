@@ -4,8 +4,10 @@ metadata:
   name: web
 spec:
   ports:
-  - port: 8080
-    name: http
+    - port: 8080
+      name: http
+    - port: 5005
+      name: debug
   type: LoadBalancer
   selector:
     app: web
@@ -24,7 +26,11 @@ spec:
         app: web
     spec:
       containers:
-      - name: web
-        image: javaincontainer
-        ports:
-          - containerPort: 8080
+        - name: web
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: -agentlib:jdwp=transport=dt_socket,server=y,address=5005,suspend=n,quiet=y
+          image: javaincontainer
+          ports:
+            - containerPort: 8080
+            - containerPort: 5005

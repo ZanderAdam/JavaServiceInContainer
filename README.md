@@ -57,7 +57,7 @@ Run the app with `./mvnw spring-boot:run` (`mvnw.cmd` on windows) and navigate t
 Next is running the app in a docker container using [jib](https://github.com/GoogleContainerTools/jib)
 
 ### Jib
-Jib is added as a maven plugin by editing the `pom.xml`. This will create an image called `javaincontainer` and expose the `8080` port. 
+Jib is added as a maven plugin by editing the `pom.xml`. This will create an image called `javaincontainer` and expose the `8080` port and `5005` (for remote debugging). 
 
 ```xml
 <plugins>
@@ -73,6 +73,7 @@ Jib is added as a maven plugin by editing the `pom.xml`. This will create an ima
       <container> 
         <ports>
           <port>8080</port>
+          <port>5005</port>  
         </ports>
       </container> 
     </configuration>
@@ -116,43 +117,11 @@ build:
 
 This will use the local registry for the image `javaincontainer` and use jib for image building. 
 
-Next define the k8s manifest for the service. Create a new dir `k8s` and create a new file `web.yaml` with a simple service definition:
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: web
-spec:
-  ports:
-  - port: 8080
-    name: http
-  type: LoadBalancer
-  selector:
-    app: web
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: web
-spec:
-  selector:
-    matchLabels:
-      app: web
-  template:
-    metadata:
-      labels:
-        app: web
-    spec:
-      containers:
-      - name: web
-        image: javaincontainer
-        ports:
-          - containerPort: 8080
-```
+Next define the k8s manifest for the service. Create a new dir `k8s` and create a new file `web.yaml` with a [simple service definition](k8s/web.yaml).
 
 Run `skaffold dev` to rebuild the image and automatically deploy to the local Docker for Desktop. visit `http://localhost:8080/` to get greeted once again!  
 Now is when the real magic happens. Edit `IndexController.java` and change "Hello World" to "Sup World". Skaffold will automatically kick off the build and update your docker container. Once the rebuild is done, refresh the browser to be greeted with "Sup World"!
 
+You can also debug! The container exposes port `5005` for debugging that you can attach to.
+
 ![Docker Preferences](./docs/awesome.jpeg)
- 
