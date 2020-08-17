@@ -2,7 +2,7 @@
 
 Building on the simple "Hello World" service in the master branch, this branch adds a mysql database. 
 
-The database [k8s manifest file](k8s/db.yaml) initializes a simple `Greetings` db.
+The database [k8s manifest file](templates/db.yaml) initializes a simple `Greetings` db.
 
 The database is exposed to the host on `localhost:32463`
 

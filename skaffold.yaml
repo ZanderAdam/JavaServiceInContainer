@@ -7,3 +7,15 @@ build:
   - image: javaincontainer
     context: .
     jib: {}
+deploy:
+  helm:
+    releases:
+      - name: javaincontainer
+        artifactOverrides:
+          image: javaincontainer
+        namespace: "javaincontainer"
+        chartPath: "./"
+        valuesFiles: ["./values.local.yaml"]
+    flags:
+      install: ["--create-namespace"]
+      upgrade: ["--create-namespace"]

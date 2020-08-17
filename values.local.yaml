@@ -1,0 +1,16 @@
+imageConfig:
+  pullPolicy: IfNotPresent
+web:
+  port: 8080
+mysql:
+  mysqlRootPassword: password
+  initializationFiles:
+    init-db.sql: |-
+      CREATE DATABASE Greetings;
+      USE Greetings;
+      create table GreetingsTable
+      (
+          greeting varchar(32)
+      );
+      INSERT INTO GreetingsTable (greeting)
+      VALUES('hello world from a db')

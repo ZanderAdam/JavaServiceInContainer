@@ -46,3 +46,6 @@ buildNumber.properties
 
 # intellij
 .idea/
+
+# Chart dependencies
+**/charts/*.tgz

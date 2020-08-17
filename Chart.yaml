@@ -1,0 +1,10 @@
+apiVersion: v2
+name: javaincontainer
+description: Helm Chart for a simple Java app
+type: application
+version: 0.0.1
+appVersion: 0.0.1
+dependencies:
+  - name: mysql
+    version: 1.6.6
+    repository: "@stable"

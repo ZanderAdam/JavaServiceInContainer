@@ -4,7 +4,7 @@ metadata:
   name: web
 spec:
   ports:
-    - port: 8080
+    - port: {{ .Values.web.port }}
       name: http
     - port: 5005
       name: debug
@@ -27,10 +27,11 @@ spec:
     spec:
       containers:
         - name: web
+          image: {{ .Values.image }}
+          imagePullPolicy: {{ .Values.imageConfig.pullPolicy }}
           env:
             - name: JAVA_TOOL_OPTIONS
               value: -agentlib:jdwp=transport=dt_socket,server=y,address=5005,suspend=n,quiet=y
-          image: javaincontainer
           ports:
-            - containerPort: 8080
+            - containerPort: {{ .Values.web.port }}
             - containerPort: 5005
